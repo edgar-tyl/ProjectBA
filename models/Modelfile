@@ -1,0 +1,1 @@
+FROM ./Meta-Llama-3-8B-Instruct.Q8_0.gguf
