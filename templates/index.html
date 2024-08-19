@@ -1,0 +1,43 @@
+<!doctype html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>ProjectBA</title>    
+</head>
+
+
+
+<body>    
+    <p id="message">
+        Write something
+    </p>
+
+    <form id="prompt" onsubmit="event.preventDefault();">
+        <textarea name="text" id ="text"></textarea>
+        <input type="submit">
+    </form>
+
+    <script>       
+        const prompt = document.getElementById("prompt");
+        prompt.addEventListener("submit", getAnswer);
+        function getAnswer(){
+            let text = document.getElementById("text").value;
+            console.log(text);
+            let data = new FormData()
+            data.append("text",text );
+            const answer = document.getElementById("message");
+            fetch('/submit', {
+                method: "POST",
+                "body": data,
+            })
+            .then(response => response.json())
+            .then(data => answer.textContent = data.message)
+            .catch(error => cosnole.error('Error fetching the message', error));
+            
+        }
+    </script>
+
+
+</body>
+

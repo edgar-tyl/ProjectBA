@@ -5,6 +5,7 @@ import getpass
 import os
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.llms import Ollama
+from langchain_community.llms import LlamaCpp
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts.prompt import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
