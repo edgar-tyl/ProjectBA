@@ -1,0 +1,253 @@
+[
+    {
+        "id": 0,        
+        "question":"Who is the owner of the apartment with the id 6?",
+        "sql": "SELECT o.OwnerName, ao.ApartmentID FROM ApartmentOwnership ao LEFT JOIN Owners o ON ao.OwnerID = o.OwnerID WHERE ao.ApartmentID = 6;"
+    },
+    {
+        "id":1,
+        "question": "How many apartments are currently in the database?",
+        "sql":"SELECT COUNT(ad.ApartmentID) FROM ApartmentDetails ad"
+    },
+    {
+        "id":2,
+        "question": "Show me all Apartments with their adresses from Dana Thompson sorted by ratings?",
+        "sql":"SELECT o.OwnerName, ad.ApartmentID, ad.ApartmentAddress, ar.Rating FROM ApartmentOwnership ao JOIN Owners o ON ao.OwnerID = o.OwnerID JOIN ApartmentDetails ad ON ad.ApartmentID = ao.ApartmentID JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID WHERE o.OwnerName = \"Dana Thompson\" ORDER BY ar.Rating;"        
+    },
+    {
+        "id":3,
+        "question": "Give me all sales up to the year 2002 with their respective owner?",
+        "sql":"SELECT ot.Date, o.OwnerName, ot.Price, ot.TransferID FROM ApartmentOwnership ao LEFT JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID LEFT JOIN Owners o ON ao.OwnerID = o.OwnerID WHERE ot.Date < \"2002-01-01\" ORDER BY ot.Date;"
+    },
+    {
+        "id":4,
+        "question": "Which apartments have a balcony and atleast 3 rooms?",
+        "sql":"SELECT ApartmentAddress, ApartmentID, NumberOfRooms FROM ApartmentDetails WHERE NumberOfRooms >= 3 AND Balcony = True;"
+    },
+    {
+        "id":5,
+        "question": "Which apartments have a rating of 3 or higher?",
+        "sql":"SELECT ad.ApartmentAddress, ad.ApartmentID, ar.Rating FROM ApartmentRatings ar LEFT JOIN ApartmentDetails ad ON ar.ApartmentID = ad.ApartmentID WHERE ar.Rating >= 3;"
+    },
+    {
+        "id":6,
+        "question": "Which apartments have a higher than average size?",
+        "sql":"SELECT ApartmentAddress, Size FROM ApartmentDetails WHERE Size > (SELECT AVG(Size) FROM ApartmentDetails);"
+    },
+    {
+        "id":7,
+        "question": "How many rooms, including hte bathrooms, does the apartment on 1216 Brian Camp Apt. 161, South Joshuaborough, MA 12806 have ",
+        "sql":"SELECT SUM (NumberOfRooms + NumberOfBathrooms) as Rooms FROM ApartmentDetails WHERE ApartmentAddress = \"1216 Brian Camp Apt. 161, South Joshuaborough, MA 12806\""
+    },
+    {
+        "id":8,
+        "question": "What was the average price of an apartment transfer between the year 2000 and 2010?",
+        "sql":"SELECT AVG(PRICE) FROM OwnershipTransfers WHERE Date > \"2000-1-1\" AND DATE < \"2010-12-31\";"
+    },
+    {
+        "id":9,
+        "question": "Give me the description of apartment 4848 Vanessa Club, East Kellyfurt, GU 55904",
+        "sql":"SELECT des.Description FROM ApartmentDetails det LEFT JOIN ApartmentDescription des ON det.ApartmentID = des.ApartmentID WHERE det.ApartmentAddress = \"4848 Vanessa Club, East Kellyfurt, GU 55904\""
+    },
+    {
+        "id":10,
+        "question": "List all apartments with atleast 2 rooms and a balcony",
+        "sql":"SELECT ApartmentAddress, Size, NumberOfRooms FROM ApartmentDetails WHERE NumberOfRooms > 2 AND Balcony = 1;"
+    },
+    {
+        "id":11,
+        "question": "Give me the ownership history of apartment the apartment with the id 8?",
+        "sql":"SELECT o.OwnerName, ot.Price, ot.Date FROM ApartmentOwnership ao JOIN Owners o ON ao.OwnerID = o.OwnerID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ao.ApartmentID = 8;"
+    },
+    {
+        "id":12,
+        "question": "List apartments with their most recent owner and the last sale price.",
+        "sql":"SELECT ad.ApartmentAddress, o.OwnerName, ot.Price, ot.Date FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN Owners o ON ao.OwnerID = o.OwnerID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.Date = ( SELECT MAX(ot2.Date) FROM OwnershipTransfers ot2 JOIN ApartmentOwnership ao2 ON ot2.TransferID = ao2.TransferID WHERE ao2.ApartmentID = ad.ApartmentID);"
+    },
+    {
+        "id":13,
+        "question": "Show me the highest rated apartments with their details",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms, ar.Rating, ar.Text FROM ApartmentDetails ad JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID WHERE ar.Rating = (SELECT MAX(Rating) FROM ApartmentRatings);"
+    },
+    {
+        "id":14,
+        "question": "Get me the rating of the apartment with the id 45",
+        "sql":"SELECT Rating, Text FROM ApartmentRatings WHERE ApartmentID = 45;"
+    },
+    {
+        "id":15,
+        "question": "Retrieve all apartments which received a rating of 5 stars",
+        "sql":"SELECT ad.ApartmentAddress, ar.Rating, ar.Text FROM ApartmentDetails ad JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID WHERE ar.Rating = 5;"
+    },
+    {
+        "id":17,
+        "question": "Give me a list of all apartments and their associated owners.",
+        "sql":"SELECT ad.ApartmentAddress, o.OwnerName FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN Owners o ON ao.OwnerID = o.OwnerID;"
+    },
+    {
+        "id":18,
+        "question": "Find all apartments of the person with the ID=1",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID WHERE ao.OwnerID = 1;"
+    },
+    {
+        "id":19,
+        "question": "Find all apartments of Matthew Beltran",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN Owners o ON ao.OwnerID = o.OwnerID WHERE o.OwnerName = \"Matthew Beltran\";"
+    },
+    {
+        "id":20,
+        "question": "Get the five most expensive apartments with their specification",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms, ot.Price FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID ORDER BY ot.Price DESC LIMIT 5;"
+    },
+    {
+        "id":21,
+        "question": "Show me all sales after 2015",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ot.Price, ot.Date FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.Date > '2015-01-01';"
+    },
+    {
+        "id":22,
+        "question": "Show me the average size of the apartments for each owner",
+        "sql":"SELECT o.OwnerName, AVG(ad.Size) AS AverageSize FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID  GROUP BY o.OwnerName;"
+    },
+    {
+        "id":23,
+        "question": "Give me all apartments with a spacious interior.",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms FROM ApartmentDetails ad JOIN ApartmentDescription d ON ad.ApartmentID = d.ApartmentID WHERE d.Description LIKE '%spacious%';"
+    },
+    {
+        "id":24,
+        "question": "What is the total revenue?",
+        "sql":"SELECT SUM(ot.Price) AS TotalRevenue FROM OwnershipTransfers ot;"
+    },
+    {
+        "id":25,
+        "question": "Who owns more than 9 apartments?",
+        "sql":"SELECT o.OwnerName, COUNT(ao.ApartmentID) AS NumberOfApartments FROM Owners o JOIN ApartmentOwnership ao ON o.OwnerID = ao.OwnerID GROUP BY o.OwnerID HAVING COUNT(ao.ApartmentID) > 9;"
+    },
+    {
+        "id":26,
+        "question": "Retrieve apartments along with the number of ratings they have received.",
+        "sql":"SELECT ad.ApartmentAddress, COUNT(ar.Rating) AS NumberOfRatings FROM ApartmentDetails ad LEFT JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID GROUP BY ad.ApartmentID;"
+    },
+    {
+        "id":27,
+        "question": "Give me the highest ratet apartment with atleast 3 rooms and a balcony.",
+        "sql":"SELECT ad.ApartmentAddress, MAX(ar.Rating) AS HighestRating FROM ApartmentDetails ad JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID WHERE ad.NumberOfRooms >= 3 AND ad.Balcony = 1;"
+    },
+    {
+        "id":28,
+        "question": "Who is the owner of the most expensive purchase?",
+        "sql":"SELECT o.OwnerName, ot.Price FROM Owners o JOIN ApartmentOwnership ao ON o.OwnerID = ao.OwnerID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID ORDER BY ot.Price DESC LIMIT 1;"
+    },
+    {
+        "id":29,
+        "question": "List all apartments along with their last sale date and price.",
+        "sql":"SELECT ad.ApartmentAddress, ot.Date, ot.Price FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.Date = (SELECT MAX(ot2.Date) FROM OwnershipTransfers ot2 JOIN ApartmentOwnership ao2 ON ot2.TransferID = ao2.TransferID WHERE ao2.ApartmentID = ad.ApartmentID);"
+    },
+    {
+        "id":30,
+        "question": "Retrieve the most recent ownership transfer for each apartment.",
+        "sql":"SELECT ad.ApartmentAddress, ot.Date, ot.Price FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.TransferID = (SELECT MAX(ot2.TransferID) FROM OwnershipTransfers ot2 JOIN ApartmentOwnership ao2 ON ot2.TransferID = ao2.TransferID WHERE ao2.ApartmentID = ad.ApartmentID);"
+    },
+    {
+        "id":31,
+        "question": "What is the average price per square foot of apartments that have more than 2 bathrooms",
+        "sql":"SELECT AVG(ot.Price / ad.Size) AS AvgPricePerSquareFoot FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ad.NumberOfBathrooms > 2;"
+    },
+    {
+        "id":32,
+        "question": "List all apartments and their associated owners who purchased them within the last year.",
+        "sql":"SELECT AVG(ot.Price / ad.Size) AS AvgPricePerSquareFoot FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ad.NumberOfBathrooms > 2;"
+    },
+    {
+        "id":33,
+        "question": "Give me a list of all apartments and their owners along with the purchase price sorted by the purchase date.",
+        "sql":"SELECT ad.ApartmentAddress, o.OwnerName, ot.Price, ot.Date FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN Owners o ON ao.OwnerID = o.OwnerID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID ORDER BY ot.Date DESC;"
+    },
+    {
+        "id":34,
+        "question": "How many bathrooms are in the database?",
+        "sql":"SELECT SUM(NumberOfBathrooms) AS TotalBathrooms FROM ApartmentDetails;"
+    },
+    {
+        "id":35,
+        "question": "Who has the largest apartment?",
+        "sql":"SELECT o.OwnerName, ad.Size FROM Owners o JOIN ApartmentOwnership ao ON o.OwnerID = ao.OwnerID JOIN ApartmentDetails ad ON ao.ApartmentID = ad.ApartmentID ORDER BY ad.Size DESC LIMIT 1;"
+    },
+    {
+        "id":36,
+        "question": "Which apartments have been sold for under $200,000 and have atleast 3 rooms",
+        "sql":"SELECT ad.ApartmentAddress, ot.Price, ad.NumberOfRooms FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.Price < 200000 AND ad.NumberOfRooms >= 3;"
+    },
+    {
+        "id":37,
+        "question": "What was the average sale price in 2022?",
+        "sql":"SELECT AVG(ot.Price) AS AveragePrice FROM OwnershipTransfers ot WHERE strftime('%Y', ot.Date) = '2022';"
+    },
+    {
+        "id":38,
+        "question": "Show me the ratings and their rating text from all apartments which have lower than 3 stars rating",
+        "sql":"SELECT ad.ApartmentAddress, ar.Rating, ar.Text FROM ApartmentDetails ad JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID WHERE ar.Rating < 3;"
+    },
+    {
+        "id":39,
+        "question": "Which apartments have been owned by the same owner by the same owner",
+        "sql":"SELECT ad.ApartmentAddress, o.OwnerName, ot.Date AS PurchaseDate FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN Owners o ON ao.OwnerID = o.OwnerID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.Date <= date('now', '-50 years');"
+    },
+    {
+        "id":40,
+        "question": "List me all apartments with a description that mentions the word \"modern\" and have at least 2 bathrooms.",
+        "sql":"SELECT ad.ApartmentAddress, ad.NumberOfBathrooms, d.Description FROM ApartmentDetails ad JOIN ApartmentDescription d ON ad.ApartmentID = d.ApartmentID WHERE d.Description LIKE '%modern%' AND ad.NumberOfBathrooms >= 2;"
+    },
+    {
+        "id":41,
+        "question": "Which apartment was the cheapest and what are their details?",
+        "sql":"SELECT ad.ApartmentAddress, ot.Price, ot.Date FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID ORDER BY ot.Price ASC LIMIT 1;"
+    },
+    {
+        "id":42,
+        "question": "Show all apartments of owners who live in Rhode Island?",
+        "sql":"SELECT ad.ApartmentAddress, o.OwnerName, o.Address FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN Owners o ON ao.OwnerID = o.OwnerID WHERE o.Address LIKE '%RI%';"
+    },
+    {
+        "id":43,
+        "question": "Find the average number of rooms in apartments that have been rated 4 stars or higher.",
+        "sql":"SELECT AVG(ad.NumberOfRooms) AS AverageRooms FROM ApartmentDetails ad JOIN ApartmentRatings ar ON ad.ApartmentID = ar.ApartmentID WHERE ar.Rating >= 4;"
+    },
+    {
+        "id":44,
+        "question": "What details have the apartments sold in the last 12 month?",
+        "sql":"SELECT ad.ApartmentAddress, ot.Price, ot.Date FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE ot.Date >= date('now', '-12 month');"
+    },
+    {
+        "id":45,
+        "question": "Get the number of apartments owned by each owner sorted by the owner who owns the most apartments.",
+        "sql":"SELECT o.OwnerName, COUNT(ao.ApartmentID) AS NumberOfApartments FROM Owners o JOIN ApartmentOwnership ao ON o.OwnerID = ao.OwnerID GROUP BY o.OwnerID ORDER BY NumberOfApartments DESC;"
+    },
+    {
+        "id":46,
+        "question": "What are the 3 most expensive apartments? Show me the details and their respective owner.",
+        "sql":"SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms, ad.NumberOfBathrooms, ad.Balcony, ot.Price, o.OwnerName FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID JOIN Owners o ON ao.OwnerID = o.OwnerID ORDER BY ot.Price DESC LIMIT 3;"
+    },
+    {
+        "id":47,
+        "question": "Show me the apartments with 3 a size above 1000 sq feet and atleast 2 bathrooms",
+        "sql":"SELECT ApartmentAddress, Size, NumberOfBathrooms FROM ApartmentDetails WHERE NumberOfBathrooms > 2 AND Size > 1000;"
+    },
+    {
+        "id":48,
+        "question": "Show me the amount of purchases of each apartment owner in the last 15 years.",
+        "sql":"SELECT o.OwnerName, COUNT(ao.ApartmentID) AS ApartmentsPurchased FROM Owners o JOIN ApartmentOwnership ao ON o.OwnerID = ao.OwnerID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID  GROUP BY o.OwnerID;"
+    },
+    {
+        "id":49,
+        "question": "Which apartments have a price per square foot greater than $1,000",
+        "sql":"SELECT ad.ApartmentAddress, ot.Price, ad.Size, (ot.Price / ad.Size) AS PricePerSquareFoot FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID WHERE (ot.Price / ad.Size) > 1000;"
+    },
+    {
+        "id":50,
+        "question": "Find the apartment with the smallest size and its associated details.",
+        "sql":"SELECT ApartmentAddress, Size, NumberOfRooms, NumberOfBathrooms, Balcony FROM ApartmentDetails ORDER BY Size ASC LIMIT 1;"
+    }
+]   
+
