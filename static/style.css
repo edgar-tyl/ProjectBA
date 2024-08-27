@@ -138,3 +138,6 @@ html {
     align-self: start;
     min-width: 10em;
   }
+  p {
+    white-space: pre-line;
+  }

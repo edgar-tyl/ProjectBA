@@ -14,7 +14,10 @@ from langchain.chains import create_sql_query_chain
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from operator import itemgetter
-
+from langchain_ollama import OllamaEmbeddings
+from langchain_chroma import Chroma
+from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from langchain_community.utilities.sql_database import SQLDatabase
 class AiHandler:
     def __init__(self) -> None:
         self.tasks = {}
@@ -22,15 +25,14 @@ class AiHandler:
         self.task_number = 0
         self.llm = Ollama(model="Llama3-8b")
         self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
-
+        
         #print(self.db.dialect)
         #print(self.db.get_usable_table_names())
         #print(self.db.run("SELECT * FROM ApartmentDetails"))
         #https://python.langchain.com/v0.1/docs/use_cases/sql/quickstart/
         
         self.template_query = '''Create a SQLite3 Query of the users question. It must be pure SQlite and no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all
-        The maxmimum numbers of results are {top_k}.
-        {table_info}.
+        {table_info}. If not stated otherwise use only the top {top_k} results.
 
         Question: {input}'''
 
@@ -51,8 +53,54 @@ class AiHandler:
                 )
                 | self.answer
             )
-
         
     def runTask(self, prompt):
         answer = self.chain.invoke({"question": "{prompt}".format(prompt = prompt)})
         return answer
+    
+    def format_document_list(self, items):
+        return "\n".join([f"{item.page_content}\n" for item in items])
+    
+
+    def createRetrievalChain(self,prompt):
+        embeddings = OllamaEmbeddings(model = "nomic-embed-text")
+
+        vector_store = Chroma(
+            collection_name="sql_examples_collection",
+            embedding_function=embeddings,
+            persist_directory=(os.path.join(".","ProjectBA","databases","chroma_langchain_db")),  # Where to save data locally, remove if not neccesary
+        )
+        retriever = vector_store.as_retriever(search_kwargs={'k': 3})
+        template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all
+        {table_info}. 
+        Question: {input}
+        
+        Here are a few example queries, which may help you to answer the question:
+        {examples}
+        '''
+        
+        template_answerRAG = '''Answer the users question with the given  sql table and the sql query.
+        Query: {query}
+        Data extracted from Table: {table}. 
+        Question: {input}'''
+
+        prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
+        prompt_answerRAG = PromptTemplate.from_template(template_answerRAG)
+
+        toolkit = QuerySQLDataBaseTool(db=self.db, llm=self.llm)
+        examples = self.format_document_list(retriever.invoke(prompt))
+        chainQuery = prompt_queryRAG | self.llm | StrOutputParser()
+        sql_query = chainQuery.invoke({"table_info": self.db.get_context(),"input":prompt, "examples": examples})
+        table = toolkit.invoke(sql_query)
+        chainAnswer = prompt_answerRAG | self.llm | StrOutputParser()
+        answer = chainAnswer.invoke({"query": sql_query,"table": table, "input":prompt})
+        
+        fullAnswer = f'''
+        Question: {prompt}\n
+        Query: {sql_query}\n
+        Table: {table}
+        Answer: {answer}
+        '''
+        
+        return fullAnswer
+        
