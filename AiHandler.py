@@ -26,33 +26,6 @@ class AiHandler:
         self.llm = Ollama(model="Llama3-8b")
         self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
         
-        #print(self.db.dialect)
-        #print(self.db.get_usable_table_names())
-        #print(self.db.run("SELECT * FROM ApartmentDetails"))
-        #https://python.langchain.com/v0.1/docs/use_cases/sql/quickstart/
-        
-        self.template_query = '''Create a SQLite3 Query of the users question. It must be pure SQlite and no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all
-        {table_info}. If not stated otherwise use only the top {top_k} results.
-
-        Question: {input}'''
-
-        self.template_answer =     """Given the following user question, corresponding SQL query, and SQL result, answer the user question.
-        Use the following format for answering the quesstion:
-        Question: {question}
-        SQL Query: {query}
-        SQL Result: {result}
-        Answer: """
-        self.prompt_query = PromptTemplate.from_template(self.template_query)
-        self.prompt_answer = PromptTemplate.from_template(self.template_answer) 
-        self.answer = self.prompt_answer | self.llm | StrOutputParser()       
-        execute_query = QuerySQLDataBaseTool(db=self.db)
-        write_query = create_sql_query_chain(self.llm, self.db, self.prompt_query)
-        self.chain = (
-            RunnablePassthrough.assign(query=write_query).assign(
-                result=itemgetter("query") | execute_query
-                )
-                | self.answer
-            )
         
     def runTask(self, prompt):
         answer = self.chain.invoke({"question": "{prompt}".format(prompt = prompt)})
@@ -62,16 +35,33 @@ class AiHandler:
         return "\n".join([f"{item.page_content}\n" for item in items])
     
 
-    def createRetrievalChain(self,prompt):
-        embeddings = OllamaEmbeddings(model = "nomic-embed-text")
-
+    
+    def queryDB(self, sql_query):
+        con = sqlite3.connect("./ProjectBA/databases/real_estate.db")
+        cur = con.cursor()
+        cur.execute(sql_query)
+        #https://stackoverflow.com/questions/65934371/return-data-from-sqlite-with-headers-python3
+        headers = list(map(lambda attr : attr[0], cur.description))
+        print(headers)
+        results = [{header:row[i] for i, header in enumerate(headers)} for row in cur]
+        return results
+    
+    def createRetriever(self, model , collection_name, directory, amount):
+        embeddings = OllamaEmbeddings(model = model)
         vector_store = Chroma(
-            collection_name="sql_examples_collection",
+            collection_name=collection_name,
             embedding_function=embeddings,
-            persist_directory=(os.path.join(".","ProjectBA","databases","chroma_langchain_db")),  # Where to save data locally, remove if not neccesary
+            persist_directory=(directory),  # Where to save data locally, remove if not neccesary
         )
-        retriever = vector_store.as_retriever(search_kwargs={'k': 3})
-        template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all
+        retriever = vector_store.as_retriever(search_kwargs={'k': amount})
+        return retriever
+    
+
+    def createRetrievalChain(self,prompt):
+
+        retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
+        template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
+        Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly.
         {table_info}. 
         Question: {input}
         
@@ -79,19 +69,18 @@ class AiHandler:
         {examples}
         '''
         
-        template_answerRAG = '''Answer the users question with the given  sql table and the sql query.
-        Query: {query}
-        Data extracted from Table: {table}. 
+        template_answerRAG = '''Answer the users question with the given sql table in JSON format. Only use data from the extracted table and do not make data up.
+        Data extracted from Table: {table}.
+        Query:{query} 
         Question: {input}'''
-
         prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
         prompt_answerRAG = PromptTemplate.from_template(template_answerRAG)
 
-        toolkit = QuerySQLDataBaseTool(db=self.db, llm=self.llm)
         examples = self.format_document_list(retriever.invoke(prompt))
         chainQuery = prompt_queryRAG | self.llm | StrOutputParser()
         sql_query = chainQuery.invoke({"table_info": self.db.get_context(),"input":prompt, "examples": examples})
-        table = toolkit.invoke(sql_query)
+        print(sql_query)
+        table = self.queryDB(sql_query)
         chainAnswer = prompt_answerRAG | self.llm | StrOutputParser()
         answer = chainAnswer.invoke({"query": sql_query,"table": table, "input":prompt})
         

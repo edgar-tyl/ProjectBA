@@ -24,6 +24,9 @@ html {
     background: #524f4f;
     border: none;
     resize: none;
+    max-width: 960px;
+    margin: 0 auto;
+    width: 960px;
   }
   
   hr {
