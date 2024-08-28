@@ -8,15 +8,25 @@
 
 
 
-<body>    
-    <p id="message">
-        Write something
-    </p>
+<body>
+    <div class = "outer">
+        <h2>ProjectBA</h2>
+        <div class="answer">
+            
+            <p id="message">
+                Write somethingsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+            </p>
+        </div>    
+        <div class="chat">
+            <form id="prompt" onsubmit="event.preventDefault();">
+                <textarea name="text" id ="text" placeholder="Ask a question to the database..."></textarea>
+                <input type="submit">
+            </form>
+        </div>
+    </div>
 
-    <form id="prompt" onsubmit="event.preventDefault();">
-        <textarea name="text" id ="text"></textarea>
-        <input type="submit">
-    </form>
+    
+
 
     <script>       
         const prompt = document.getElementById("prompt");

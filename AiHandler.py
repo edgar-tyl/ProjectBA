@@ -87,7 +87,7 @@ class AiHandler:
         fullAnswer = f'''
         Question: {prompt}\n
         Query: {sql_query}\n
-        Table: {table}
+        Table: {table}\n
         Answer: {answer}
         '''
         
