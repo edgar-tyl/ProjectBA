@@ -46,11 +46,12 @@ textarea{
   border: none;
   color: #b9b2b2;
   font-family: sans-serif;
-  border-radius: 15px;
+  border-radius: 10px;
 }
 input{
   color: #b9b2b2;
   background: #2e2d2d;
   border-color: black;
+  border-radius: 10px;
 }
 
