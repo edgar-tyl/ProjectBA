@@ -20,5 +20,5 @@ def hello():
 
 @bp.route('/submit', methods = ['GET', 'POST'])
 def submit():  
-    return jsonify(message = ai.createRetrievalChain(request.form['text']))
+    return jsonify(message = ai.runTask(request.form['text']))
 

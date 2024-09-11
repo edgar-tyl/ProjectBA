@@ -1,36 +1,44 @@
-import argparse 
-import socket
-import sys
-import getpass
 import sqlite3
 import sqlglot
 import os
-from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.llms import Ollama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts.prompt import PromptTemplate
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.utilities import SQLDatabase
-from langchain.chains import create_sql_query_chain
-from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-from operator import itemgetter
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
-from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_community.utilities.sql_database import SQLDatabase
 class AiHandler:
     def __init__(self) -> None:
         self.tasks = {}
         self.results = {}
         self.task_number = 0
+
         self.llm = Ollama(model="Llama3-8b")
+        self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
         self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
         
+        self.chainQuery = self.createSQLChain(self.llm)
+        self.chainAnswer = self.createAnswerChain(self.llm)
         
     def runTask(self, prompt):
-        answer = self.chain.invoke({"question": "{prompt}".format(prompt = prompt)})
-        return answer
+        examples = self.retrieveDocuments(prompt, self.retriever)
+
+        sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
+        table = self.queryDB(sql_query)
+        while((table == None) or (self.validateQuery(sql_query) == False)):
+            sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
+            print(sql_query)
+            table = self.queryDB(sql_query)
+        
+        answer = self.getAnswer(self.chainAnswer, sql_query, table, prompt)
+        fullAnswer = f'''
+        Question: {prompt}\n
+        Query: {sql_query}\n
+        Table: {table}\n
+        Answer: {answer}
+        '''
+        return fullAnswer
     
     def format_document_list(self, items):
         return "\n".join([f"{item.page_content}\n" for item in items])
@@ -58,7 +66,7 @@ class AiHandler:
         except sqlite3.OperationalError as e:
             print("Error: SQL could not be executed because of {e}".format(e))
             return None
-        #https://stackoverflow.com/questions/65934371/return-data-from-sqlite-with-headers-python3
+        #https://stackoverflow.com/questions/65934371/return-data-from-sqlite-with-headers-python3 from user logi-kal
         headers = list(map(lambda attr : attr[0], cur.description))
         print(headers)
         results = [{header:row[i] for i, header in enumerate(headers)} for row in cur]
@@ -69,15 +77,16 @@ class AiHandler:
         vector_store = Chroma(
             collection_name=collection_name,
             embedding_function=embeddings,
-            persist_directory=(directory),  # Where to save data locally, remove if not neccesary
+            persist_directory=(directory),  
         )
         retriever = vector_store.as_retriever(search_kwargs={'k': amount})
         return retriever
     
-
-    def createRetrievalChain(self,prompt):
-
-        retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
+    def retrieveDocuments(self, prompt, retriever):
+        examples = self.format_document_list(retriever.invoke(prompt))
+        return examples
+    
+    def createSQLChain(self, llm):
         template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and add no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
         Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
         DDL: {table_info}. 
@@ -86,44 +95,28 @@ class AiHandler:
         Here are a few example queries, which may help you to answer the question:
         {examples}
         '''
-        
-
-        template_queryRAGWrong = '''The previous sqlite statement could not be executed. Create only the sqlite SELECT statement based on the users question and the ddl.It must be pure SQlite and add no indications that it is SQL.  Do NOT explain anything
-        DDL: {table_info}. 
-        Question: {input}
-        
-        Here are a few example queries, which may help you to answer the question:
-        {examples}
-        '''
-
+        prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
+        chainQuery = prompt_queryRAG | llm | StrOutputParser()
+        return chainQuery
+    
+    def createAnswerChain(self, llm):
         template_answerRAG = '''Answer the users question with the given sql table in JSON format. Only use data from the extracted table and do not make data up.
         Data extracted from Table: {table}.
         Query:{query} 
         Question: {input}'''
-        prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
-        prompt_queryRAGWrong = PromptTemplate.from_template(template_queryRAGWrong)
         prompt_answerRAG = PromptTemplate.from_template(template_answerRAG)
-        
-        examples = self.format_document_list(retriever.invoke(prompt))
-        chainQuery = prompt_queryRAG | self.llm | StrOutputParser()
-        
-        sql_query = chainQuery.invoke({"table_info": self.db.get_context(),"input":prompt, "examples": examples})
-        table = None
-        while(table == None):            
-            while(self.validateQuery(sql_query) == False):
-                sql_query = chainQuery.invoke({"table_info": self.db.get_context(),"input":prompt, "examples": examples})
-            print(sql_query)
-            table = self.queryDB(sql_query)
-        chainAnswer = prompt_answerRAG | self.llm | StrOutputParser()
-        answer = chainAnswer.invoke({"query": sql_query,"table": table, "input":prompt})
-        
-        fullAnswer = f'''
-        Question: {prompt}\n
-        Query: {sql_query}\n
-        Table: {table}\n
-        Answer: {answer}
-        '''
-        
-        return fullAnswer
+        chainAnswer = prompt_answerRAG | llm | StrOutputParser()
+        return chainAnswer
     
-        
+    def createSQLQuery(self, chainQuery, db, prompt, examples):
+        sql_query = chainQuery.invoke({"table_info": db.get_context(),"input":prompt, "examples": examples})           
+        return sql_query
+    
+    def getSQLTable(self, sql_query):
+        table = self.queryDB(sql_query)
+        return table
+    
+    def getAnswer(self, chainAnswer, sql_query, table, prompt):
+        answer = chainAnswer.invoke({"query": sql_query,"table": table, "input":prompt})
+        return answer
+    
