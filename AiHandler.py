@@ -4,6 +4,7 @@ import os
 from langchain_community.llms import Ollama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts.prompt import PromptTemplate
+from langchain_core.prompts.few_shot import FewShotPromptTemplate
 from langchain_community.utilities import SQLDatabase
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
@@ -15,8 +16,14 @@ class AiHandler:
         self.task_number = 0
 
         self.llm = Ollama(model="Llama3-8b")
-        self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
-        self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
+        if os.path.basename(os.getcwd()) == "ProjectBA":
+            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","databases","chroma_langchain_db"), 3 )
+            self.db = SQLDatabase.from_uri("sqlite:///databases/real_estate.db")
+        else:
+            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
+            self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
+        
+        
         
         self.chainQuery = self.createSQLChain(self.llm)
         self.chainAnswer = self.createAnswerChain(self.llm)
@@ -34,6 +41,7 @@ class AiHandler:
         answer = self.getAnswer(self.chainAnswer, sql_query, table, prompt)
         fullAnswer = f'''
         Question: {prompt}\n
+        Examples: {examples}\n
         Query: {sql_query}\n
         Table: {table}\n
         Answer: {answer}
@@ -57,14 +65,17 @@ class AiHandler:
         print("Valid SQL")
         return True
 
-    
-    def queryDB(self, sql_query):
-        con = sqlite3.connect("./ProjectBA/databases/real_estate.db")
+    @staticmethod
+    def queryDB(sql_query):
+        if os.path.basename(os.getcwd()) != "ProjectBA":
+            con = sqlite3.connect(os.path.join(".","ProjectBA","databases","real_estate.db"))
+        else:
+            con = sqlite3.connect(os.path.join(".","databases","real_estate.db"))
         cur = con.cursor()
         try:
             cur.execute(sql_query)
-        except sqlite3.OperationalError as e:
-            print("Error: SQL could not be executed because of {e}".format(e))
+        except sqlite3.OperationalError:
+            print("Error: SQL could not be executed")
             return None
         #https://stackoverflow.com/questions/65934371/return-data-from-sqlite-with-headers-python3 from user logi-kal
         headers = list(map(lambda attr : attr[0], cur.description))
@@ -92,7 +103,7 @@ class AiHandler:
         DDL: {table_info}. 
         Question: {input}
         
-        Here are a few example queries, which may help you to answer the question:
+        Here are a few example queries witch answer the question of a user, which may help you to generate a query:
         {examples}
         '''
         prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
@@ -100,7 +111,8 @@ class AiHandler:
         return chainQuery
     
     def createAnswerChain(self, llm):
-        template_answerRAG = '''Answer the users question with the given sql table in JSON format. Only use data from the extracted table and do not make data up.
+        template_answerRAG = '''Answer the users question with the given sql table in JSON format. The table was created with the given sqlite SELECT-Statement. 
+        Only use data from the extracted table and do not make data up.
         Data extracted from Table: {table}.
         Query:{query} 
         Question: {input}'''

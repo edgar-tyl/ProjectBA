@@ -14,18 +14,22 @@ class Embedder:
         self.vector_store = Chroma(
             collection_name="sql_examples_collection",
             embedding_function=self.embeddings,
-            persist_directory=(os.path.join(".","databases","chroma_langchain_db")),  # Where to save data locally, remove if not neccesary
+            persist_directory=(os.path.join(".","databases","chroma_langchain_db")), 
         )
 
-    def getListFromJSON(self, file):
-        with open(os.path.join(".","databases",file)) as data_file:    
+    @staticmethod
+    def getListFromJSON(filepath):
+        with open(filepath) as data_file:    
             data = json.load(data_file)
             docList = []
             for item in data:
                 docList.append(Document(
-                    page_content= item.get("sql"),
+                    page_content= "question: " + item.get("question") + "\n" + "sql: " + item.get("sql"),
                     id= item.get("id")
             ))
+        
+        print(docList[:1])
+
         return docList
     
     def createEmbeddings(self, docList):
@@ -42,6 +46,6 @@ class Embedder:
        
 
 ai = Embedder()
-List = ai.getListFromJSON("sql_examples.json")
+List = ai.getListFromJSON(os.path.join(".","databases","sql_examples.json"))
 ai.createEmbeddings(List)
 #print(ai.similarity("SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms, ad.NumberOfBathrooms, ad.Balcony, ot.Price, o.OwnerName FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID JOIN Owners o ON ao.OwnerID = o.OwnerID ORDER BY ot.Price DESC LIMIT 3;"))
