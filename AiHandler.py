@@ -99,7 +99,7 @@ class AiHandler:
     
     def createSQLChain(self, llm):
         template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and add no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
-        Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
+        Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database. Limit the query to 10 results, unless it is stated otherwise in the question.
         DDL: {table_info}. 
         Question: {input}
         
@@ -111,8 +111,8 @@ class AiHandler:
         return chainQuery
     
     def createAnswerChain(self, llm):
-        template_answerRAG = '''Answer the users question with the given sql table in JSON format. The table was created with the given sqlite SELECT-Statement. 
-        Only use data from the extracted table and do not make data up.
+        template_answerRAG = '''Explain the data to the users question with the given sql table in JSON format in regards of the users question. The table was created with the given sqlite SELECT-Statement. 
+        Only use data from the extracted table and do not make data up. You only need to explain the data to the users. There is no need to restate the data again for the user.
         Data extracted from Table: {table}.
         Query:{query} 
         Question: {input}'''

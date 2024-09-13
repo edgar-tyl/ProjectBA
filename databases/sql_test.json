@@ -27,7 +27,7 @@
     {
         "id": 5,
         "question":"What is the total value of ownership transfers for each apartment?",
-        "sql":"SELECT ApartmentAddress, ApartmentID, Size, NumberOfRooms, NumberOfBathrooms FROM ApartmentDetails WHERE NumberOfBathrooms > 2 AND NumberOfRooms >= 3;"
+        "sql":"SELECT ao.ApartmentID, SUM(ot.Price) AS TotalValueOfTransfers FROM ApartmentOwnership ao JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID GROUP BY ao.ApartmentID;"
     },
     {
         "id": 6,

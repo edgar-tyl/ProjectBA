@@ -7,7 +7,8 @@
       {
         "Description": "**\n\nThis cozy apartment is located in a desirable neighborhood and offers a comfortable living experience. The apartment features 2 rooms that can be used as a bedroom and a living area depending on your preferences. The rooms are well-laid out and have ample space for furniture and storage. The apartment also has 2 bathroom(s) that are equipped with modern fixtures and fittings.\n\nThe apartment does not have a balcony, which makes it ideal for people who prefer a quiet living environment. The apartment is located on a higher floor, which provides plenty of natural light and views of the surrounding area.\n\nThe apartment is a great investment opportunity for a single person or a couple or a small family who is looking for a comfortable and convenient living space. The apartment is located close to public transportation options and amenities such as shops, restaurants, parks, and other facilities.\n\n**Features and Amenities**\n\n*"
       }
-    ]
+    ],
+    "answer": "The description for the apartment with the ID 14 is as follows:**\n\nThis cozy apartment is located in a desirable neighborhood and offers a comfortable living experience. The apartment features 2 rooms that can be used as a bedroom and a living area depending on your preferences. The rooms are well-laid out and have ample space for furniture and storage. The apartment also has 2 bathroom(s) that are equipped with modern fixtures and fittings.\n\nThe apartment does not have a balcony, which makes it ideal for people who prefer a quiet living environment. The apartment is located on a higher floor, which provides plenty of natural light and views of the surrounding area.\n\nThe apartment is a great investment opportunity for a single person or a couple or a small family who is looking for a comfortable and convenient living space. The apartment is located close to public transportation options and amenities such as shops, restaurants, parks, and other facilities.\n\n**Features and Amenities**\n\n*"
   },
   {
     "id": 1,
@@ -378,7 +379,8 @@
         "OwnerName": "Jeffrey Jackson",
         "ApartmentAddress": "6451 Gregory Place Suite 102, Lake Christopher, MS 70794"
       }
-    ]
+    ],
+    "answer": "The given data shows 91 entries with the owners of the apartment with their name and the apartment adress of the apartment they own."
   },
   {
     "id": 2,
@@ -425,7 +427,8 @@
         "OwnerName": "Robert Watkins",
         "NumberOfApartments": 13
       }
-    ]
+    ],
+    "answer": "Here is the list from the given data:* Lori Taylor: 11\n * Robert Watkins: 13\n* Richard Lambert: 13\n* Jeremiah Simmons: 10\n* Joy Smith: 5\n* Bradley Alexander: 4\n* Devin Ramirez: 10\n* Judy Kelly: 9\n* Casey Melton: 8\n* Jeffrey Jackson: 8"
   },
   {
     "id": 3,
@@ -457,7 +460,8 @@
         "Date": "2023-11-19",
         "Price": 220000.72
       }
-    ]
+    ],
+    "answer": "Here is a list of the apartments which have been transfered after 2023-01-01:\n8677 George Path Suite 809, Amyhaven, AL 02450\n779 Baker Fall, South Bryanchester, PR 18709\nPSC 3719, Box 1243, APO AE 90106\n27348 Garcia Throughway Suite 333, Webbport, DE 20915\n2911 Mason Union, South Amanda, AL 77792"
   },
   {
     "id": 4,
@@ -604,7 +608,8 @@
         "NumberOfRooms": 5,
         "NumberOfBathrooms": 3
       }
-    ]
+    ],
+    "answer": "The given table answers the question and shows every apartment with atleast two bathrooms and atleast three rooms."
   },
   {
     "id": 5,
@@ -1003,7 +1008,8 @@
         "ApartmentID": 99,
         "TotalValueOfTransfers": 392168.78
       }
-    ]
+    ],
+    "answer": "The given data shows all apartments with their ID and the total value of all transfers for the aparmtent."
   },
   {
     "id": 6,
@@ -1014,7 +1020,8 @@
         "OwnerName": "Casey Melton",
         "Price": 482451.58
       }
-    ]
+    ],
+    "answer": "The owner who bought the most expenisve apartment ist 'Casey Melton', who bought a apartment with the price of $482451.58"
   },
   {
     "id": 7,
@@ -1053,7 +1060,8 @@
         "OwnerName": "Robert Watkins",
         "NumberOfApartments": 13
       }
-    ]
+    ],
+    "answer": "There are eight owners who owns more than 6 apartments. Here are list of the owners:\nCasey Melton\nDevin Ramirez\nJeffrey Jackson\nJeremiah Simmons\nJudy Kelly\nLori Taylor\nRichard Lambert\nRobert Watkins\n"
   },
   {
     "id": 8,
@@ -1550,7 +1558,8 @@
         "Price": 392168.78,
         "Date": "2004-07-21"
       }
-    ]
+    ],
+    "answer": "The table shows all apartments with their adresses, price and last tranfser date."
   },
   {
     "id": 9,
@@ -1732,7 +1741,8 @@
         "NumberOfBathrooms": 3,
         "Balcony": 1
       }
-    ]
+    ],
+    "answer": "The table shows all Apartments with descriptios which includes 'Panoramic Views' along with their Size, number of room, number of bathrooms and if they have a balcony."
   },
   {
     "id": 10,
@@ -1779,7 +1789,8 @@
         "OwnerName": "Robert Watkins",
         "TotalRooms": 43
       }
-    ]
+    ],
+    "answer": "Here is a list of owners and the number of rooms across all apartments each one owns:\nBradley Alexander with 10 rooms\nCasey Melton with 34 rooms\nDevin Ramirez with 26 rooms\nJeffrey Jackson with 25 rooms\nJeremiah Simmons with 29 room\nJoy Smith with 14 rooms\nJudy Kell with 29 rooms\n Lori Taylor with 35 rooms\n Richard Lambert with 41 rooms\nRobert Watkins with 43 rooms"
   },
   {
     "id": 11,
@@ -1966,7 +1977,8 @@
         "Year": "2024",
         "AveragePrice": 143332.93
       }
-    ]
+    ],
+    "answer": "The table shows the average price for the year 1970 upto the year 2024."
   },
   {
     "id": 12,
@@ -1977,7 +1989,8 @@
         "NumberOfRooms": 5,
         "Frequency": 26
       }
-    ]
+    ],
+    "answer": "The most common number of rooms for apartments is **5**. In the given data are 26 apartments which have 5 rooms."
   },
   {
     "id": 13,
@@ -2024,7 +2037,8 @@
         "OwnerName": "Robert Watkins",
         "TotalBathrooms": 24
       }
-    ]
+    ],
+    "answer": "Here is a list of each owner and the amount of bathrooms across all apartments they own:\nHere is a list of owners and the number of rooms across all apartments each one owns:\nBradley Alexander with 9 bathrooms\nCasey Melton with 16 bathrooms\nDevin Ramirez with 19 bathrooms\nJeffrey Jackson with 21 bathrooms\nJeremiah Simmons with 22 bathroom\nJoy Smith with 10 bathrooms\nJudy Kell with 18 bathrooms\nLori Taylor with 19 bathrooms\n Richard Lambert with 26 bathrooms\nRobert Watkins with 24 bathrooms"
   },
   {
     "id": 14,
@@ -2037,7 +2051,8 @@
         "NumberOfRooms": 3,
         "NumberOfBathrooms": 2
       }
-    ]
+    ],
+    "answer": "The smalles apartment with atleast 2 bathrooms has the adress 05531 West Square, South Ashleychester, VA 25425 and has a size of 413 and has 3 rooms"
   },
   {
     "id": 15,
@@ -2084,7 +2099,8 @@
         "OwnerName": "Robert Watkins",
         "ApartmentsWithBalcony": 6
       }
-    ]
+    ],
+    "answer": "Here is a list of each owner and the amount of apartments with a balcony they own:\nBradley Alexander: 3\nCasey Melton: 3\nDevin Ramirez: 5\nJeffrey Jackson: 5\n Jeremiah Simmons: 6\nJoy Smith: 1\nJudy Kell:4\nLori Taylor: 6\n Richard Lambert: 6\nRobert Watkins: 6"
   },
   {
     "id": 16,
@@ -2591,7 +2607,8 @@
         "Rating": 1,
         "Text": "1/5\nI am a retired person who rented this apartment for a short period of time. I had a very bad experience here. The apartment is very old and needs a lot of renovation. The rooms are very small and there is no space to move around. The bathroom is very dirty and there is no shower in it. The water is also very cold sometimes. There is no heating system in the apartment. I had a very cold night because of this. I had a very bad experience here. I do not recommend this apartment to anyone especially old people like me. I will never rent this apartment again.\nI am a retired person who rented this apartment for a short period of time. I had a very bad experience here. The apartment is very old and needs a lot of renovation. The rooms are very small and there is no space to move around. The bathroom is very dirty and there is no shower in it. The water is also very cold sometimes. There is no heating system"
       }
-    ]
+    ],
+    "answer": "The list shows all apartments with their latest rating from 1-5 and the review-text for the rating."
   },
   {
     "id": 17,
@@ -2829,7 +2846,8 @@
       {
         "ApartmentAddress": "6451 Gregory Place Suite 102, Lake Christopher, MS 70794"
       }
-    ]
+    ],
+    "answer": "The list shows all apartments with their adress which never received a rating of 1."
   },
   {
     "id": 18,
@@ -2856,7 +2874,8 @@
         "NumberOfRooms": 5,
         "AverageSize": 861.2692307692307
       }
-    ]
+    ],
+    "answer": "The data shows all apartments grouped by their number of rooms and the average size. Here is list of the apartments ordered by the number of rooms:\n[Number of rooms: 1, Average size: 982.785]\n[Number of rooms: 2, Average size: 1032.590]\n[Number of rooms: 3, Average size: 992.4]\n[Number of rooms: 4, Average size: 941.611]\n[Number of rooms: 5, Average size: 861.269]"
   },
   {
     "id": 19,
@@ -3263,7 +3282,8 @@
         "ApartmentAddress": "0199 Terry Dam, Rodriguezton, CA 13563",
         "Description": "**\n\n**Apartment Details**\n\n* **Number of Rooms:** 1\n* **Bathroom(s):** 2\n* **Balcony:** No\n* **Additional Features:** None\n\n**"
       }
-    ]
+    ],
+    "answer": "The given data shows all apartments with their adress and description sorted by in descending order."
   },
   {
     "id": 20,
@@ -3466,7 +3486,8 @@
         "ApartmentAddress": "21410 Miller Alley, Nancymouth, SD 10784",
         "Rating": 1
       }
-    ]
+    ],
+    "answer": "The given data shows all apartments with a rating of 1 or 2."
   },
   {
     "id": 21,
@@ -3481,7 +3502,8 @@
         "Balcony": 1,
         "AverageRooms": 3.04
       }
-    ]
+    ],
+    "answer": "The data shows the average number of rooms with and without a balcony. Apartments without a balcony have an average number of rooms of 3.36.Apartments with a balcony have an average number of rooms of 3.04 "
   },
   {
     "id": 22,
@@ -3568,7 +3590,8 @@
         "AverageRating": 5.0,
         "MaxPrice": 450598.65
       }
-    ]
+    ],
+    "answer": "0"
   },
   {
     "id": 23,
@@ -3767,7 +3790,8 @@
         "ApartmentAddress": "6451 Gregory Place Suite 102, Lake Christopher, MS 70794",
         "Size": 1120
       }
-    ]
+    ],
+    "answer": "The data show all adresses of all apartments which are bigger than average with their size. The average size of all apartments is not given. For example the apartment with the adress 635 Christopher Vista, Longview, DE 64997 is bigger than average and has the size of 1084."
   },
   {
     "id": 24,
@@ -3814,6 +3838,7 @@
         "OwnerName": "Robert Watkins",
         "TotalTransferValue": 4985493.67
       }
-    ]
+    ],
+    "answer": "The table shows the owners with the total value of their transfers. For example transfered Bradley Alexander a total amount of $1212450.3599"
   }
 ]

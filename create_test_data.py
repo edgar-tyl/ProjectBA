@@ -37,4 +37,4 @@ with open(FILEPATH_INPUT) as data_file:
                 item["table"] = table
                 finalList.append(item) 
             with open(FILEPATH_OUTPUT, "w") as output:
-                  json.dump(finalList, output)
+                  json.dump(finalList, output, indent=2)
