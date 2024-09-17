@@ -19,6 +19,10 @@ class AiHandler:
         if os.path.basename(os.getcwd()) == "ProjectBA":
             self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","databases","chroma_langchain_db"), 3 )
             self.db = SQLDatabase.from_uri("sqlite:///databases/real_estate.db")
+        if os.path.basename(os.getcwd()) == "evaluation":
+            print("")
+            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join("../","databases","chroma_langchain_db"), 3 )
+            self.db = SQLDatabase.from_uri("sqlite:///../databases/real_estate.db")
         else:
             self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
             self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
@@ -67,10 +71,12 @@ class AiHandler:
 
     @staticmethod
     def queryDB(sql_query):
-        if os.path.basename(os.getcwd()) != "ProjectBA":
-            con = sqlite3.connect(os.path.join(".","ProjectBA","databases","real_estate.db"))
-        else:
+        if os.path.basename(os.getcwd()) == "ProjectBA":
             con = sqlite3.connect(os.path.join(".","databases","real_estate.db"))
+        elif os.path.basename(os.getcwd()) == "evaluation":
+            con = sqlite3.connect(os.path.join("..","databases","real_estate.db"))
+        else:
+            con = sqlite3.connect(os.path.join(".","ProjectBA","databases","real_estate.db"))
         cur = con.cursor()
         try:
             cur.execute(sql_query)
