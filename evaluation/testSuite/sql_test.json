@@ -2,7 +2,7 @@
     {
         "id": 0,
         "question":"What is the descriiption of the apartment with the ID 14?",
-        "sql":"SELECT Description FROM ApartmentDescription WHERE ApartmentID = 1;"
+        "sql":"SELECT Description FROM ApartmentDescription WHERE ApartmentID = 14;"
     },
     {
         "id": 1,

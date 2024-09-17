@@ -2,7 +2,7 @@
   {
     "id": 0,
     "question": "What is the descriiption of the apartment with the ID 14?",
-    "sql": "SELECT Description FROM ApartmentDescription WHERE ApartmentID = 1;",
+    "sql": "SELECT Description FROM ApartmentDescription WHERE ApartmentID = 14;",
     "table": [
       {
         "Description": "**\n\nThis cozy apartment is located in a desirable neighborhood and offers a comfortable living experience. The apartment features 2 rooms that can be used as a bedroom and a living area depending on your preferences. The rooms are well-laid out and have ample space for furniture and storage. The apartment also has 2 bathroom(s) that are equipped with modern fixtures and fittings.\n\nThe apartment does not have a balcony, which makes it ideal for people who prefer a quiet living environment. The apartment is located on a higher floor, which provides plenty of natural light and views of the surrounding area.\n\nThe apartment is a great investment opportunity for a single person or a couple or a small family who is looking for a comfortable and convenient living space. The apartment is located close to public transportation options and amenities such as shops, restaurants, parks, and other facilities.\n\n**Features and Amenities**\n\n*"

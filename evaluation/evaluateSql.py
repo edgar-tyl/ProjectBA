@@ -37,7 +37,7 @@ def tablesSame(table_predict, table_gold, sortList= True):
     return True
 
 
-def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention ):
+def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention, folder ):
     testSet = zip(sql_queries_predict, sql_queries_gold)
     i = 1
 
@@ -71,7 +71,7 @@ def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention ):
             correctList.append({"id": i, "correct": False})
 
         i += 1    
-    with open("results/2024-09-16 20:02:13.039653/correct_queries.json", "w") as file:
+    with open(os.path.join(".", folder ,"correct_queries.json"), "w") as file:
         toWrite = json.dumps(correctList, indent=2)
         file.write(toWrite)
 
@@ -83,10 +83,10 @@ if __name__ == "__main__":
     parser.add_argument("--human", type = bool, required= False, help = "If you want to be able to look on wrong quries and assest manualy if they are equivalent", nargs='?', default= False)
     args = parser.parse_args()
     HUMAN_INTERVENTION = args.human
-    FOLDER = args.f
+    FOLDER = os.path.join(".","results",args.f)
     FILE_GOLD = args.gold
-    sql_queries_predict, questions = readQueries(os.path.join(".","results", FOLDER, "sql_queries_predict.txt"))
+    sql_queries_predict, questions = readQueries(os.path.join(".", FOLDER, "sql_queries_predict.txt"))
     sql_queries_gold = readQueries(FILE_GOLD)[0]
-    evaulateSQL(sql_queries_predict,sql_queries_gold, HUMAN_INTERVENTION)
+    evaulateSQL(sql_queries_predict,sql_queries_gold, HUMAN_INTERVENTION, FOLDER)
 
 
