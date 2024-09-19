@@ -1,3 +1,8 @@
+"""
+Class which contains the retriever, the llm and the means to query the db
+Uses by blueprint 'chat.py'
+"""
+
 import sqlite3
 import sqlglot
 import os
@@ -9,38 +14,30 @@ from langchain_community.utilities import SQLDatabase
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_community.utilities.sql_database import SQLDatabase
-class AiHandler:
-    def __init__(self) -> None:
-        self.tasks = {}
-        self.results = {}
-        self.task_number = 0
 
-        self.llm = Ollama(model="Llama3-8b")
-        if os.path.basename(os.getcwd()) == "ProjectBA":
-            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","databases","chroma_langchain_db"), 3 )
-            self.db = SQLDatabase.from_uri("sqlite:///databases/real_estate.db")
-        if os.path.basename(os.getcwd()) == "evaluation":
-            print("")
-            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join("../","databases","chroma_langchain_db"), 3 )
-            self.db = SQLDatabase.from_uri("sqlite:///../databases/real_estate.db")
-        else:
-            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".","ProjectBA","databases","chroma_langchain_db"), 3 )
-            self.db = SQLDatabase.from_uri("sqlite:///ProjectBA/databases/real_estate.db")
-        
-        
+class AiHandler:
+    def __init__(self, folder) -> None:
+        #folder from which AiHandler is started
+        self.folder = folder
+        #Ollama is used for inference, must be same name as stated here in Ollama 
+        self.llm = Ollama(model="llama3.1:8b-instruct-q8_0")
+        self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".",folder,"databases","chroma_langchain_db"), 3 )
+        self.db = SQLDatabase.from_uri("sqlite:///" + folder + "/databases/real_estate.db")
         
         self.chainQuery = self.createSQLChain(self.llm)
         self.chainAnswer = self.createAnswerChain(self.llm)
-        
+
+    #Basic implementation of RAG. Retriever collects examples. Afterwards query will be created with the help of these examples. Afterwards query DB for table
+    #Table is used in last answer generation. Afterwards returns formatted answer    
     def runTask(self, prompt):
         examples = self.retrieveDocuments(prompt, self.retriever)
-
+        print(examples)
         sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
-        table = self.queryDB(sql_query)
+        table = self.queryDB(sql_query, self.folder)
         while((table == None) or (self.validateQuery(sql_query) == False)):
             sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
             print(sql_query)
-            table = self.queryDB(sql_query)
+            table = self.queryDB(sql_query, self.folder)
         
         answer = self.getAnswer(self.chainAnswer, sql_query, table, prompt)
         fullAnswer = f'''
@@ -51,10 +48,11 @@ class AiHandler:
         Answer: {answer}
         '''
         return fullAnswer
-    
+    #only retrieve the page cpntent from documents
     def format_document_list(self, items):
         return "\n".join([f"{item.page_content}\n" for item in items])
     
+    #Basic SQL Validator. Only select statements are allowed. Afterwards parse into sqglot-Parser for syntax validation
     def validateQuery(self, sql_query : str):
         sql_query = sql_query.replace("```", "")
         if "SELECT" != sql_query[:6]:
@@ -69,14 +67,11 @@ class AiHandler:
         print("Valid SQL")
         return True
 
+    #Queries DB and format it as a list of dict. LLM understands data better with the labels instead of only the raw data
     @staticmethod
-    def queryDB(sql_query):
-        if os.path.basename(os.getcwd()) == "ProjectBA":
-            con = sqlite3.connect(os.path.join(".","databases","real_estate.db"))
-        elif os.path.basename(os.getcwd()) == "evaluation":
-            con = sqlite3.connect(os.path.join("..","databases","real_estate.db"))
-        else:
-            con = sqlite3.connect(os.path.join(".","ProjectBA","databases","real_estate.db"))
+    def queryDB(sql_query, folder):
+
+        con = sqlite3.connect(os.path.join(".", folder ,"databases","real_estate.db"))
         cur = con.cursor()
         try:
             cur.execute(sql_query)
@@ -88,7 +83,7 @@ class AiHandler:
         print(headers)
         results = [{header:row[i] for i, header in enumerate(headers)} for row in cur]
         return results
-    
+    #creates retriever with langchain from Chroma
     def createRetriever(self, model , collection_name, directory, amount):
         embeddings = OllamaEmbeddings(model = model)
         vector_store = Chroma(
@@ -98,14 +93,15 @@ class AiHandler:
         )
         retriever = vector_store.as_retriever(search_kwargs={'k': amount})
         return retriever
-    
+    #uses retriever to retrieve relevant documents. Only list of page content is returned
     def retrieveDocuments(self, prompt, retriever):
         examples = self.format_document_list(retriever.invoke(prompt))
         return examples
     
+    #simple chain with single prompt template for creating sql-queries with the help of examples and the ddl of the database
     def createSQLChain(self, llm):
         template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and add no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
-        Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database. Limit the query to 10 results, unless it is stated otherwise in the question.
+        Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
         DDL: {table_info}. 
         Question: {input}
         
@@ -115,7 +111,7 @@ class AiHandler:
         prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
         chainQuery = prompt_queryRAG | llm | StrOutputParser()
         return chainQuery
-    
+    #simple chain with single prompt template for creating sql-queries
     def createAnswerChain(self, llm):
         template_answerRAG = '''Explain the data to the users question with the given sql table in JSON format in regards of the users question. The table was created with the given sqlite SELECT-Statement. 
         Only use data from the extracted table and do not make data up. You only need to explain the data to the users. There is no need to restate the data again for the user.

@@ -1,9 +1,15 @@
+"""
+Combines all evaluation module in a single module. No need to call every single module manually 
+"""
+
 import datetime
 import create_queries
 import evaluateSql
 import os
+
 folderName = os.path.join(".", "results", str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M")))
 FILE_GOLD = os.path.join(".","testSuite", "sql_queries_gold.txt")
+#For evaluating SQl-Generation of the LLM
 create_queries.create_queries("./testSuite/sql_queries_gold.txt", folderName, "../databases/real_estate_ddl.sql")
 sql_queries_predict, questions = evaluateSql.readQueries(os.path.join(".", folderName, "sql_queries_predict.txt"))
 sql_queries_gold = evaluateSql.readQueries(FILE_GOLD)[0]

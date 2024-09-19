@@ -1,3 +1,4 @@
+#Creates embeddings from JSON file with questions, sql and id elements . Uses ChromaDB
 import chromadb
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma

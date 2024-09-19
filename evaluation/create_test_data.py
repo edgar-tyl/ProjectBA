@@ -1,3 +1,4 @@
+#Read JSON file. Queries DB for each sql statement in json file. Afterwards create file with tables
 import sqlite3
 import argparse 
 import json

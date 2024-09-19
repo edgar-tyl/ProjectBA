@@ -1,3 +1,6 @@
+"""
+Evaluate SQL-Queries from a file for execution accuracy with a file where the gold queries are stored
+"""
 import sys, os
 parent_directory = os.path.abspath('../..')
 sys.path.append(parent_directory)
@@ -5,6 +8,10 @@ from ProjectBA.AiHandler import AiHandler # type: ignore
 import json
 import argparse
 
+FOLDER = "../"
+
+#read queries from a file which saves queries like this : "question ||| sql"
+#line break determines new QA-tuple
 
 def readQueries(file):
     with open(file) as data_file:
@@ -15,7 +22,8 @@ def readQueries(file):
             sql_queries.append(sql_query.replace("\n", " "))
             questions.append(question)
         return sql_queries, questions
-    
+
+#checks table for equivalence, when every query is the same, then returns true, else false    
 def tablesSame(table_predict, table_gold, sortList= True):
     table_predict_stripped = []
     table_gold_stripped = []
@@ -36,7 +44,8 @@ def tablesSame(table_predict, table_gold, sortList= True):
             return False
     return True
 
-
+#query DB and calls tableSame() for every table. If human_intervention is true, it will be able to check wrong queries manually.
+#results will be wriiten in the same folder with the name "correct_queries.json"
 def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention, folder ):
     testSet = zip(sql_queries_predict, sql_queries_gold)
     i = 1
@@ -45,8 +54,8 @@ def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention, folde
     tables_gold = []
 
     for queries in testSet:
-        tables_predict.append(AiHandler.queryDB(queries[0]))
-        tables_gold.append(AiHandler.queryDB(queries[1]))
+        tables_predict.append(AiHandler.queryDB(queries[0], FOLDER))
+        tables_gold.append(AiHandler.queryDB(queries[1], FOLDER))
 
     tables = zip(tables_predict, tables_gold)
     i = 0

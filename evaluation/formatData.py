@@ -1,3 +1,5 @@
+#Script to format the previous created JSON-Data to "question ||| sql" to use in canonicaliser.py
+
 import json
 import json
 import argparse

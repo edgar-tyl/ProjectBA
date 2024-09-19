@@ -1,3 +1,4 @@
+#Flask App, which is started by the command "flask --app ProjectBA run" from the parent folder
 import os
 from flask import Flask
 def create_app(test_config=None):
@@ -18,19 +19,8 @@ def create_app(test_config=None):
     # ensure the instance folder exists
 
     # a simple page that says hello
-    
-    """
-    from . import db
-    db.init_app(app)
 
-    from . import auth
-    app.register_blueprint(auth.bp)
-
-    from . import blog
-    app.register_blueprint(blog.bp)
-    app.add_url_rule('/', endpoint='index')
-    """
-
+    #add the chat blueprint to the app
     from . import chat
 
     app.register_blueprint(chat.bp)

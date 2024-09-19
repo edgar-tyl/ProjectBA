@@ -1,7 +1,7 @@
 [
   {
     "id": 0,
-    "correct": false
+    "correct": true
   },
   {
     "id": 1,
@@ -25,7 +25,7 @@
   },
   {
     "id": 6,
-    "correct": true
+    "correct": false
   },
   {
     "id": 7,
@@ -65,7 +65,7 @@
   },
   {
     "id": 16,
-    "correct": true
+    "correct": false
   },
   {
     "id": 17,
@@ -77,11 +77,11 @@
   },
   {
     "id": 19,
-    "correct": true
+    "correct": false
   },
   {
     "id": 20,
-    "correct": true
+    "correct": false
   },
   {
     "id": 21,
@@ -93,7 +93,7 @@
   },
   {
     "id": 23,
-    "correct": true
+    "correct": false
   },
   {
     "id": 24,
