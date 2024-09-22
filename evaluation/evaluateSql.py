@@ -8,7 +8,6 @@ from ProjectBA.AiHandler import AiHandler # type: ignore
 import json
 import argparse
 
-FOLDER = "../"
 
 #read queries from a file which saves queries like this : "question ||| sql"
 #line break determines new QA-tuple
@@ -25,6 +24,8 @@ def readQueries(file):
 
 #checks table for equivalence, when every query is the same, then returns true, else false    
 def tablesSame(table_predict, table_gold, sortList= True):
+    if(table_predict is None):
+        return False
     table_predict_stripped = []
     table_gold_stripped = []
     if len(table_predict) != len(table_gold):
@@ -46,41 +47,51 @@ def tablesSame(table_predict, table_gold, sortList= True):
 
 #query DB and calls tableSame() for every table. If human_intervention is true, it will be able to check wrong queries manually.
 #results will be wriiten in the same folder with the name "correct_queries.json"
-def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention, folder ):
+def evaulateSQL(sql_queries_predict, sql_queries_gold, questions, human_intervention, pathAi, FOLDER ):
     testSet = zip(sql_queries_predict, sql_queries_gold)
     i = 1
 
     tables_predict = []
     tables_gold = []
 
-    for queries in testSet:
-        tables_predict.append(AiHandler.queryDB(queries[0], FOLDER))
-        tables_gold.append(AiHandler.queryDB(queries[1], FOLDER))
+    for queries in testSet: 
+        tables_predict.append(AiHandler.queryDB(queries[0], pathAi))
+        tables_gold.append(AiHandler.queryDB(queries[1], pathAi))
 
     tables = zip(tables_predict, tables_gold)
     i = 0
     correctList = []
-
+    correctCounter = 0
     for table in tables:
         if(tablesSame(table[0], table[1])):
             print("Tables with id " + str(i) + " are the same" )
             correctList.append({"id": i, "correct": True})
+            correctCounter += 1
         else:
             print("Tables with id " + str(i) + " are not the same" )
             print("Query(prediction): " + str(sql_queries_predict[i]))
             print("Query(gold): " + str(sql_queries_gold[i]))
             if(human_intervention):
                 humanEval = ""
-                while(humanEval != "YES" and  humanEval != "NO"):
-                    humanEval = input("Are the two queries equivalent in regards of the question?: " + questions[i] + "\n Answer with 'YES' or 'NO'").upper()
-                    if(humanEval == "YES"):
-                        correctList.append({"id": i, "correct": True})
-                    else:
-                        correctList.append({"id": i, "correct": False})
-            correctList.append({"id": i, "correct": False})
+                while(humanEval != "YES" and  humanEval != "NO" ):
+                    try:
+                        humanEval = input("Are the two queries equivalent in regards of the question?: " + questions[i] + "\n Answer with 'YES' or 'NO'").upper()
+                        if(humanEval == "YES"):
+                            correctList.append({"id": i, "correct": True})
+                            correctCounter += 1
+                        elif(humanEval == "QUIT"):
+                            print(humanEval)
+                            sys.exit()
+                        elif(humanEval =="NO"):
+                            correctList.append({"id": i, "correct": False})
+                    except KeyboardInterrupt:
+                        print("if you want to exit type quit")
+            else:
+                correctList.append({"id": i, "correct": False})
 
-        i += 1    
-    with open(os.path.join(".", folder ,"correct_queries.json"), "w") as file:
+        i += 1
+    correctList.append({"correct answers": correctCounter, "incorrect answers": i - correctCounter, "execution accuracy": correctCounter/i})
+    with open(os.path.join(".", FOLDER ,"correct_queries.json"), "w") as file:
         toWrite = json.dumps(correctList, indent=2)
         file.write(toWrite)
 
@@ -88,14 +99,16 @@ def evaulateSQL(sql_queries_predict, sql_queries_gold, human_intervention, folde
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Tool to create the dataset for testing the system")
     parser.add_argument("--gold", type = str, required= False, help = "Path to the gold queries", nargs='?', default="./testSuite/sql_queries_gold.txt")
-    parser.add_argument("-f", type = str, required= True, help = "Path to folder")
-    parser.add_argument("--human", type = bool, required= False, help = "If you want to be able to look on wrong quries and assest manualy if they are equivalent", nargs='?', default= False)
+    parser.add_argument("-f", type = str, required= True, help = "folder name")
+    parser.add_argument("--human", required= False, help = "If you want to be able to look on wrong quries and assest manualy if they are equivalent", action='store_true')
     args = parser.parse_args()
     HUMAN_INTERVENTION = args.human
     FOLDER = os.path.join(".","results",args.f)
     FILE_GOLD = args.gold
+    PATH_TO_AI = "../"
     sql_queries_predict, questions = readQueries(os.path.join(".", FOLDER, "sql_queries_predict.txt"))
     sql_queries_gold = readQueries(FILE_GOLD)[0]
-    evaulateSQL(sql_queries_predict,sql_queries_gold, HUMAN_INTERVENTION, FOLDER)
+    
+    evaulateSQL(sql_queries_predict,sql_queries_gold, questions, HUMAN_INTERVENTION, PATH_TO_AI, FOLDER)
 
 

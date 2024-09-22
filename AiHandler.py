@@ -1,6 +1,6 @@
 """
 Class which contains the retriever, the llm and the means to query the db
-Uses by blueprint 'chat.py'
+Used by blueprint chat from 'chat.py'
 """
 
 import sqlite3
@@ -70,7 +70,6 @@ class AiHandler:
     #Queries DB and format it as a list of dict. LLM understands data better with the labels instead of only the raw data
     @staticmethod
     def queryDB(sql_query, folder):
-
         con = sqlite3.connect(os.path.join(".", folder ,"databases","real_estate.db"))
         cur = con.cursor()
         try:
@@ -111,6 +110,7 @@ class AiHandler:
         prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
         chainQuery = prompt_queryRAG | llm | StrOutputParser()
         return chainQuery
+    
     #simple chain with single prompt template for creating sql-queries
     def createAnswerChain(self, llm):
         template_answerRAG = '''Explain the data to the users question with the given sql table in JSON format in regards of the users question. The table was created with the given sqlite SELECT-Statement. 

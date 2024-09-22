@@ -47,7 +47,7 @@ def create_queries(file_input, dir_output, ddl):
                 table_temp = ai.queryDB(sql_query_predict, FOLDER)           
             file.writelines(prompt + " ||| " + sql_query_predict.replace("\n", " ") + "\n")
     #exclude aliases because it causes errors, sql not executable anymore. Not needed for later evaluation because coloumn names arent respected anyway
-    canonicaliser.standarise_file(file_input, ddl, log=True, overwrite=True, skip= ["standardise_aliases"], nonjson=True)
+        canonicaliser.standarise_file(dir_output + outputName, ddl, log=True, overwrite=True, skip= ['standardise_aliases'], nonjson=True)
 
     sql_queries_predict  = readQueries(dir_output + outputName)[0]
 
