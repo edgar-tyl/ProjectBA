@@ -8,7 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .AiHandler import AiHandler
 
 
-ai = AiHandler(os.path.join(".", "ProjectBA"))
+ai = AiHandler(os.path.join(".", "ProjectBA"), True)
 bp = Blueprint('chat', __name__)
 
 #landing page, includes chat prompt 

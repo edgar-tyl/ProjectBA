@@ -16,21 +16,23 @@ from langchain_chroma import Chroma
 from langchain_community.utilities.sql_database import SQLDatabase
 
 class AiHandler:
-    def __init__(self, folder) -> None:
+    def __init__(self, folder, RAG = False) -> None:
         #folder from which AiHandler is started
         self.folder = folder
         #Ollama is used for inference, must be same name as stated here in Ollama 
         self.llm = Ollama(model="llama3.1:8b-instruct-q8_0")
         self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".",folder,"databases","chroma_langchain_db"), 3 )
         self.db = SQLDatabase.from_uri("sqlite:///" + folder + "/databases/real_estate.db")
-        
-        self.chainQuery = self.createSQLChain(self.llm)
+        self.RAG = RAG
+        self.chainQuery = self.createSQLChain(self.llm, RAG)
         self.chainAnswer = self.createAnswerChain(self.llm)
 
     #Basic implementation of RAG. Retriever collects examples. Afterwards query will be created with the help of these examples. Afterwards query DB for table
     #Table is used in last answer generation. Afterwards returns formatted answer    
     def runTask(self, prompt):
-        examples = self.retrieveDocuments(prompt, self.retriever)
+        examples = None
+        if self.RAG:
+            examples = self.retrieveDocuments(prompt, self.retriever)
         print(examples)
         sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
         table = self.queryDB(sql_query, self.folder)
@@ -98,15 +100,23 @@ class AiHandler:
         return examples
     
     #simple chain with single prompt template for creating sql-queries with the help of examples and the ddl of the database
-    def createSQLChain(self, llm):
-        template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and add no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
-        Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
-        DDL: {table_info}. 
-        Question: {input}
-        
-        Here are a few example queries witch answer the question of a user, which may help you to generate a query:
-        {examples}
-        '''
+    def createSQLChain(self, llm, RAG):
+        if(RAG):
+            template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and add no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
+            Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
+            DDL: {table_info}. 
+            Question: {input}
+
+            Here are a few example queries witch answer the question of a user, which may help you to generate a query:
+            {examples}
+            '''
+        else:
+            template_queryRAG = '''Create a SQLite3 Query of the users question. It must be pure SQlite and add no indications that it is SQL. Do not explain that it is sql. And do not explain anything at all. U are not allowed to alter the database at all.
+            Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
+            DDL: {table_info}. 
+            Question: {input}
+
+            '''
         prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
         chainQuery = prompt_queryRAG | llm | StrOutputParser()
         return chainQuery
@@ -122,8 +132,11 @@ class AiHandler:
         chainAnswer = prompt_answerRAG | llm | StrOutputParser()
         return chainAnswer
     
-    def createSQLQuery(self, chainQuery, db, prompt, examples):
-        sql_query = chainQuery.invoke({"table_info": db.get_context(),"input":prompt, "examples": examples})           
+    def createSQLQuery(self, chainQuery, db, prompt, examples=None):
+        if examples is not None:
+            sql_query = chainQuery.invoke({"table_info": db.get_context(),"input":prompt, "examples": examples})
+        else :
+            sql_query = chainQuery.invoke({"table_info": db.get_context(),"input":prompt})           
         return sql_query
     
     def getSQLTable(self, sql_query):

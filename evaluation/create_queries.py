@@ -28,9 +28,9 @@ def readQueries(file):
         return sql_queries, questions
 
 #create the queries standarise them with canonicaliser and saves them in a file
-def create_queries(file_input, dir_output, ddl):
+def create_queries(file_input, dir_output, ddl, RAG):
     outputName = "/sql_queries_predict.txt"
-    ai = AiHandler(FOLDER)
+    ai = AiHandler(FOLDER, RAG)
     Path(dir_output).mkdir(parents=True, exist_ok=True)
     sql_queries_gold, questions = readQueries(file_input)
 
@@ -47,7 +47,7 @@ def create_queries(file_input, dir_output, ddl):
                 table_temp = ai.queryDB(sql_query_predict, FOLDER)           
             file.writelines(prompt + " ||| " + sql_query_predict.replace("\n", " ") + "\n")
     #exclude aliases because it causes errors, sql not executable anymore. Not needed for later evaluation because coloumn names arent respected anyway
-        canonicaliser.standarise_file(dir_output + outputName, ddl, log=True, overwrite=True, skip= ['standardise_aliases'], nonjson=True)
+    canonicaliser.standarise_file(dir_output + outputName, ddl, log=True, overwrite=True, skip= ['standardise_aliases'], nonjson=True)
 
     sql_queries_predict  = readQueries(dir_output + outputName)[0]
 
@@ -58,11 +58,13 @@ if __name__ == "__main__":
     parser.add_argument("-i", type = str, required= False, help = "Path to the input file", nargs='?', default="./testSuite/sql_queries_gold.txt")
     parser.add_argument("--ddl", type = str, required= False, help = "Path to ddl", nargs='?', default="../databases/real_estate_ddl.sql")
     parser.add_argument("--folder", type = str, required= False, help = "Path to folder")
+    parser.add_argument("--rag",  required= False, help = "Wheter to use rag or not", action="store_true")
     args = parser.parse_args()
     FOLDER_NAME = args.folder
     FILEPATH_INPUT = args.i
     DDL = args.ddl
+    RAG = args.rag
     
     
-    create_queries(FILEPATH_INPUT,FOLDER_NAME, DDL)
+    create_queries(FILEPATH_INPUT,FOLDER_NAME, DDL, RAG)
 
