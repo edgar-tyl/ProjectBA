@@ -14,14 +14,22 @@ from langchain_community.utilities import SQLDatabase
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_community.utilities.sql_database import SQLDatabase
-
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import FlashrankRerank
 class AiHandler:
     def __init__(self, folder, RAG = False, hyDE = False, reRank = False) -> None:
         #folder from which AiHandler is started
         self.folder = folder
         #Ollama is used for inference, must be same name as stated here in Ollama 
-        self.llm = Ollama(model="llama3.1:8b-instruct-q8_0")
-        self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".",folder,"databases","chroma_langchain_db"), 3 )
+        self.llm = Ollama(model="llama3.1:8b-instruct-q8_0")  
+        if reRank:
+            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".",folder,"databases","chroma_langchain_db"), 10 )
+            self.compressor = FlashrankRerank()
+            self.compresion_retriever = ContextualCompressionRetriever(
+                 base_compressor=self.compressor, base_retriever=self.retriever
+                 )
+        else:
+            self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".",folder,"databases","chroma_langchain_db"), 3 )
         self.db = SQLDatabase.from_uri("sqlite:///" + folder + "/databases/real_estate.db")
         self.RAG = RAG
         self.hyDE = hyDE
@@ -39,7 +47,10 @@ class AiHandler:
         if self.RAG:
             if self.hyDE:
                 promptForRetrieve = "question: " + prompt + "\n" + "sql: " + self.createSQLQuery(self.chainHyDE, self.db, promptForRetrieve, None)
-            examples = self.retrieveDocuments(promptForRetrieve, self.retriever)
+            if self.reRank:
+                examples = self.retrieveDocuments(promptForRetrieve, self.compresion_retriever)
+            else:
+                examples = self.retrieveDocuments(promptForRetrieve, self.retriever)
         print(examples)
         sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
         table = self.queryDB(sql_query, self.folder)
