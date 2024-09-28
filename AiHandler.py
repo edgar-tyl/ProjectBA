@@ -16,7 +16,7 @@ from langchain_chroma import Chroma
 from langchain_community.utilities.sql_database import SQLDatabase
 
 class AiHandler:
-    def __init__(self, folder, RAG = False) -> None:
+    def __init__(self, folder, RAG = False, hyDE = False, reRank = False) -> None:
         #folder from which AiHandler is started
         self.folder = folder
         #Ollama is used for inference, must be same name as stated here in Ollama 
@@ -24,15 +24,22 @@ class AiHandler:
         self.retriever = self.createRetriever("nomic-embed-text", "sql_examples_collection",os.path.join(".",folder,"databases","chroma_langchain_db"), 3 )
         self.db = SQLDatabase.from_uri("sqlite:///" + folder + "/databases/real_estate.db")
         self.RAG = RAG
+        self.hyDE = hyDE
+        self.reRank = reRank
         self.chainQuery = self.createSQLChain(self.llm, RAG)
         self.chainAnswer = self.createAnswerChain(self.llm)
+        if self.hyDE:
+            self.chainHyDE = self.createSQLChain(self.llm, False)
 
     #Basic implementation of RAG. Retriever collects examples. Afterwards query will be created with the help of these examples. Afterwards query DB for table
     #Table is used in last answer generation. Afterwards returns formatted answer    
     def runTask(self, prompt):
         examples = None
+        promptForRetrieve = prompt
         if self.RAG:
-            examples = self.retrieveDocuments(prompt, self.retriever)
+            if self.hyDE:
+                promptForRetrieve = "question: " + prompt + "\n" + "sql: " + self.createSQLQuery(self.chainHyDE, self.db, promptForRetrieve, None)
+            examples = self.retrieveDocuments(promptForRetrieve, self.retriever)
         print(examples)
         sql_query = self.createSQLQuery(self.chainQuery, self.db, prompt, examples)
         table = self.queryDB(sql_query, self.folder)
@@ -115,7 +122,6 @@ class AiHandler:
             Do not use qoutation marks to indicate that it is SQL. The sql statement must be executable immediatly. U only have read acces to the database.
             DDL: {table_info}. 
             Question: {input}
-
             '''
         prompt_queryRAG = PromptTemplate.from_template(template_queryRAG)
         chainQuery = prompt_queryRAG | llm | StrOutputParser()
