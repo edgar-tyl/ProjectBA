@@ -1,0 +1,3 @@
+RAG: True
+HyDE: False
+ReRank: False

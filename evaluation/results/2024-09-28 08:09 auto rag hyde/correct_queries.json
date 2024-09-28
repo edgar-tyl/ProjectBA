@@ -1,7 +1,7 @@
 [
   {
     "id": 0,
-    "correct": true
+    "correct": false
   },
   {
     "id": 1,
@@ -9,7 +9,7 @@
   },
   {
     "id": 2,
-    "correct": false
+    "correct": true
   },
   {
     "id": 3,
@@ -25,7 +25,7 @@
   },
   {
     "id": 6,
-    "correct": false
+    "correct": true
   },
   {
     "id": 7,
@@ -93,11 +93,11 @@
   },
   {
     "id": 23,
-    "correct": false
+    "correct": true
   },
   {
     "id": 24,
-    "correct": false
+    "correct": true
   },
   {
     "id": 25,
@@ -129,7 +129,7 @@
   },
   {
     "id": 32,
-    "correct": false
+    "correct": true
   },
   {
     "id": 33,
@@ -145,7 +145,7 @@
   },
   {
     "id": 36,
-    "correct": false
+    "correct": true
   },
   {
     "id": 37,
@@ -173,7 +173,7 @@
   },
   {
     "id": 43,
-    "correct": false
+    "correct": true
   },
   {
     "id": 44,
@@ -193,15 +193,15 @@
   },
   {
     "id": 48,
-    "correct": false
+    "correct": true
   },
   {
     "id": 49,
     "correct": false
   },
   {
-    "correct answers": 7,
-    "incorrect answers": 43,
-    "execution accuracy": 0.14
+    "correct answers": 14,
+    "incorrect answers": 36,
+    "execution accuracy": 0.28
   }
 ]

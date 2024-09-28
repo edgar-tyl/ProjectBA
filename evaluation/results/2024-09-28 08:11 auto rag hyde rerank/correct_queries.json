@@ -5,7 +5,7 @@
   },
   {
     "id": 1,
-    "correct": false
+    "correct": true
   },
   {
     "id": 2,
@@ -33,7 +33,7 @@
   },
   {
     "id": 8,
-    "correct": false
+    "correct": true
   },
   {
     "id": 9,
@@ -41,7 +41,7 @@
   },
   {
     "id": 10,
-    "correct": false
+    "correct": true
   },
   {
     "id": 11,
@@ -61,7 +61,7 @@
   },
   {
     "id": 15,
-    "correct": false
+    "correct": true
   },
   {
     "id": 16,
@@ -113,7 +113,7 @@
   },
   {
     "id": 28,
-    "correct": true
+    "correct": false
   },
   {
     "id": 29,
@@ -121,7 +121,7 @@
   },
   {
     "id": 30,
-    "correct": false
+    "correct": true
   },
   {
     "id": 31,
@@ -129,11 +129,11 @@
   },
   {
     "id": 32,
-    "correct": true
+    "correct": false
   },
   {
     "id": 33,
-    "correct": true
+    "correct": false
   },
   {
     "id": 34,
@@ -145,7 +145,7 @@
   },
   {
     "id": 36,
-    "correct": true
+    "correct": false
   },
   {
     "id": 37,
@@ -181,11 +181,11 @@
   },
   {
     "id": 45,
-    "correct": false
+    "correct": true
   },
   {
     "id": 46,
-    "correct": false
+    "correct": true
   },
   {
     "id": 47,
@@ -197,11 +197,11 @@
   },
   {
     "id": 49,
-    "correct": false
+    "correct": true
   },
   {
-    "correct answers": 13,
-    "incorrect answers": 37,
-    "execution accuracy": 0.26
+    "correct answers": 17,
+    "incorrect answers": 33,
+    "execution accuracy": 0.34
   }
 ]

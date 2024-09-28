@@ -28,9 +28,9 @@ def readQueries(file):
         return sql_queries, questions
 
 #create the queries standarise them with canonicaliser and saves them in a file
-def create_queries(file_input, dir_output, ddl, RAG):
+def create_queries(file_input, dir_output, ddl, RAG, HYDE, RERANK):
     outputName = "/sql_queries_predict.txt"
-    ai = AiHandler(FOLDER, RAG)
+    ai = AiHandler(FOLDER, RAG, HYDE, RERANK)
     Path(dir_output).mkdir(parents=True, exist_ok=True)
     sql_queries_gold, questions = readQueries(file_input)
 
@@ -38,17 +38,29 @@ def create_queries(file_input, dir_output, ddl, RAG):
         print("Save queries in: " + file.name)
 
         for prompt in questions:
-            examples = ai.retrieveDocuments(prompt, ai.retriever)
+            examples = None
+            promptForRetrieve = prompt
+            if ai.RAG:
+                if ai.hyDE:
+                    promptForRetrieve = "question: " + prompt + "\n" + "sql: " + ai.createSQLQuery(ai.chainHyDE, ai.db, promptForRetrieve, None)
+                    print("hyde: " + promptForRetrieve)
+                if ai.reRank:
+                    examples = ai.retrieveDocuments(promptForRetrieve, ai.compresion_retriever)
+                else:
+                    examples = ai.retrieveDocuments(promptForRetrieve, ai.retriever)
             sql_query_predict = ai.createSQLQuery(ai.chainQuery, ai.db, prompt, examples)
-            print(sql_query_predict)
             table_temp = ai.queryDB(sql_query_predict, FOLDER)
             while((table_temp == None) or (ai.validateQuery(sql_query_predict) == False)):
                 sql_query_predict = ai.createSQLQuery(ai.chainQuery, ai.db, prompt, examples)
                 table_temp = ai.queryDB(sql_query_predict, FOLDER)           
             file.writelines(prompt + " ||| " + sql_query_predict.replace("\n", " ") + "\n")
+
+    with open(dir_output + "/meta.txt", "w") as file:
+        output = "RAG: " + str(RAG) + "\nHyDE: " + str(HYDE) + "\nReRank: " + str(RERANK) 
+        file.write(output)
     #exclude aliases because it causes errors, sql not executable anymore. Not needed for later evaluation because coloumn names arent respected anyway
     canonicaliser.standarise_file(dir_output + outputName, ddl, log=True, overwrite=True, skip= ['standardise_aliases'], nonjson=True)
-
+    
     sql_queries_predict  = readQueries(dir_output + outputName)[0]
 
 
@@ -59,12 +71,16 @@ if __name__ == "__main__":
     parser.add_argument("--ddl", type = str, required= False, help = "Path to ddl", nargs='?', default="../databases/real_estate_ddl.sql")
     parser.add_argument("--folder", type = str, required= False, help = "Path to folder")
     parser.add_argument("--rag",  required= False, help = "Wheter to use rag or not", action="store_true")
+    parser.add_argument("--hyde",  required= False, help = "Wheter to use HyDe or not", action="store_true")
+    parser.add_argument("--rerank",  required= False, help = "Wheter to use ReRank or not", action="store_true")
     args = parser.parse_args()
     FOLDER_NAME = args.folder
     FILEPATH_INPUT = args.i
     DDL = args.ddl
     RAG = args.rag
+    HYDE = args.hyde
+    RERANK = args.rerank
     
     
-    create_queries(FILEPATH_INPUT,FOLDER_NAME, DDL, RAG)
+    create_queries(FILEPATH_INPUT,FOLDER_NAME, DDL, RAG, HYDE, RERANK)
 
