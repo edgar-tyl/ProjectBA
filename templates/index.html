@@ -13,7 +13,7 @@
         <h2>ProjectBA</h2>
         <div class="answer">
             
-            <p id="message">
+            <p id="messageLog">
                 
             </p>
         </div>    
@@ -36,15 +36,56 @@
             console.log(text);
             let data = new FormData()
             data.append("text",text );
-            const answer = document.getElementById("message");
+            const answer = document.getElementById("messageLog");
             fetch('/submit', {
                 method: "POST",
                 "body": data,
             })
             .then(response => response.json())
-            .then(data => answer.textContent = data.message)
-            .catch(error => cosnole.error('Error fetching the message', error));
+            .then(data => formatAnswer(data))
+            .catch(error => console.error('Error fetching the message', error));
             
+        }
+        //Used tutorial from https://www.tutorialspoint.com/how-to-convert-json-data-to-a-html-table-using-javascript-jquery
+        function formatAnswer(data){
+            //message.textContent = message.textContent + "\n" + data.question + "\n" + data.query + "\n"+ JSON.stringify(data.table) + "\n" + data.answer
+            
+            let container = document.getElementById("messageLog");
+            let answerBox = document.createElement("p");
+            answerBox.classList.add("answerBox");
+            let table = document.createElement("table");
+            let columns = Object.keys(data.table[0])
+            let thead = document.createElement("thead");
+            let tr = document.createElement("tr");
+
+            answerBox.textContent =  "\nQuestion: " + data.question + "\nGenerated Query: " + data.query + "\nAnswer: " + data.answer + "\n"
+
+            columns.forEach((item) => {
+                let th = document.createElement("th");
+                th.innerText = item; 
+                tr.appendChild(th);
+             });
+
+             thead.appendChild(tr);
+             table.append(tr)
+
+             data.table.forEach((item) => {
+                let tr = document.createElement("tr");
+                
+                // Get the values of the current object in the JSON data
+                let vals = Object.values(item);
+                
+                // Loop through the values and create table cells
+                vals.forEach((elem) => {
+                   let td = document.createElement("td");
+                   td.innerText = elem; // Set the value as the text of the table cell
+                   tr.appendChild(td); // Append the table cell to the table row
+                });
+                table.appendChild(tr); // Append the table row to the table
+             });
+             answerBox.appendChild(table) // Append the table to the container element
+             container.appendChild(answerBox);
+
         }
     </script>
 

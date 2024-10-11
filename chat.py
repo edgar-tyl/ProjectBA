@@ -8,7 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .AiHandler import AiHandler
 
 
-ai = AiHandler(os.path.join(".", "ProjectBA"), True, True, True)
+ai = AiHandler(os.path.join(".", "ProjectBA"), True, False, False)
 bp = Blueprint('chat', __name__)
 
 #landing page, includes chat prompt 
@@ -19,5 +19,9 @@ def index():
 #used when user submits question. Uses AiHandler to answer question and send answer back to client
 @bp.route('/submit', methods = ['GET', 'POST'])
 def submit():  
-    return jsonify(message = ai.runTask(request.form['text']))
+    data = ai.runTask(request.form['text'])
+    return jsonify(question = data["question"],
+                   query = data["query"],
+                   table = data["table"],
+                   answer = data["answer"])
 

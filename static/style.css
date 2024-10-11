@@ -19,6 +19,7 @@ body {
   margin: auto;
 }
 .answer{
+  overflow-y: scroll;
   width: auto;
   line-break: auto;
   word-break: break-all ;
@@ -35,6 +36,10 @@ p{
   height: 10%;
   width: 100%;
   padding-left: 10px;
+}
+
+.answerBox{
+  border: 0.05em solid rgb(0, 0, 0);
 }
 
 textarea{

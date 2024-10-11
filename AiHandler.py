@@ -67,7 +67,14 @@ class AiHandler:
         Table: {table}\n
         Answer: {answer}
         '''
-        return fullAnswer
+        data = {
+            "question": prompt,
+            "examples": examples,
+            "query": sql_query,
+            "table": table,
+            "answer": answer
+        }
+        return data
     #only retrieve the page cpntent from documents
     def format_document_list(self, items):
         return "\n".join([f"{item.page_content}\n" for item in items])
