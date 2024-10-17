@@ -1,14 +1,14 @@
 
 import os
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify, Response
+    Blueprint,  render_template, request, jsonify
 )
-from werkzeug.security import check_password_hash, generate_password_hash
+
 
 from .AiHandler import AiHandler
 
 
-ai = AiHandler(os.path.join(".", "ProjectBA"), True, False, False)
+ai = AiHandler(os.path.join("."), True, False, False)
 bp = Blueprint('chat', __name__)
 
 #landing page, includes chat prompt 

@@ -9,9 +9,9 @@ import os
 import argparse
 from datetime import datetime
 from pathlib import Path
-parent_directory = os.path.abspath('../..')
+parent_directory = os.path.abspath('../')
 sys.path.append(parent_directory)
-from ProjectBA.AiHandler import AiHandler  # type: ignore
+from app.AiHandler import AiHandler  # type: ignore
 
 FOLDER = "../"
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Tool for testing sql-generation via execution accuracy")
     parser.add_argument("-i", type = str, required= False, help = "Path to the input file", nargs='?', default="./testSuite/sql_queries_gold.txt")
     parser.add_argument("--ddl", type = str, required= False, help = "Path to ddl", nargs='?', default="../databases/real_estate_ddl.sql")
-    parser.add_argument("--folder", type = str, required= False, help = "Path to folder")
+    parser.add_argument("--folder", type = str, required= True, help = "Path to folder")
     parser.add_argument("--rag",  required= False, help = "Wheter to use rag or not", action="store_true")
     parser.add_argument("--hyde",  required= False, help = "Wheter to use HyDe or not", action="store_true")
     parser.add_argument("--rerank",  required= False, help = "Wheter to use ReRank or not", action="store_true")

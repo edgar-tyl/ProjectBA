@@ -9,7 +9,6 @@ import os
 from langchain_community.llms import Ollama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts.prompt import PromptTemplate
-from langchain_core.prompts.few_shot import FewShotPromptTemplate
 from langchain_community.utilities import SQLDatabase
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
@@ -60,13 +59,7 @@ class AiHandler:
             table = self.queryDB(sql_query, self.folder)
         
         answer = self.getAnswer(self.chainAnswer, sql_query, table, prompt)
-        fullAnswer = f'''
-        Question: {prompt}\n
-        Examples: {examples}\n
-        Query: {sql_query}\n
-        Table: {table}\n
-        Answer: {answer}
-        '''
+
         data = {
             "question": prompt,
             "examples": examples,
@@ -170,4 +163,3 @@ class AiHandler:
     def getAnswer(self, chainAnswer, sql_query, table, prompt):
         answer = chainAnswer.invoke({"query": sql_query,"table": table, "input":prompt})
         return answer
-    

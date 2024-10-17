@@ -1,9 +1,7 @@
 #Creates embeddings from JSON file with questions, sql and id elements . Uses ChromaDB
-import chromadb
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 import os
-from uuid import uuid4
 from langchain_core.documents import Document
 import json
 
@@ -49,4 +47,3 @@ class Embedder:
 ai = Embedder()
 List = ai.getListFromJSON(os.path.join(".","databases","sql_examples.json"))
 ai.createEmbeddings(List)
-#print(ai.similarity("SELECT ad.ApartmentAddress, ad.Size, ad.NumberOfRooms, ad.NumberOfBathrooms, ad.Balcony, ot.Price, o.OwnerName FROM ApartmentDetails ad JOIN ApartmentOwnership ao ON ad.ApartmentID = ao.ApartmentID JOIN OwnershipTransfers ot ON ao.TransferID = ot.TransferID JOIN Owners o ON ao.OwnerID = o.OwnerID ORDER BY ot.Price DESC LIMIT 3;"))

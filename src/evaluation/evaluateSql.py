@@ -2,9 +2,9 @@
 Evaluate SQL-Queries from a file for execution accuracy with a file where the gold queries are stored
 """
 import sys, os
-parent_directory = os.path.abspath('../..')
+parent_directory = os.path.abspath('../')
 sys.path.append(parent_directory)
-from ProjectBA.AiHandler import AiHandler # type: ignore
+from app.AiHandler import AiHandler  # type: ignore
 import json
 import argparse
 

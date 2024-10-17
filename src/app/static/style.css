@@ -10,7 +10,7 @@ body {
   margin: 0;
 }
 .outer{
-  border: 0.05em solid rgb(0, 0, 0);
+  
   width:65%;
   display: flex;
   flex-flow: column;
@@ -40,6 +40,8 @@ p{
 
 .answerBox{
   border: 0.05em solid rgb(0, 0, 0);
+  padding: 5px;
+  margin: 5px;
 }
 
 textarea{

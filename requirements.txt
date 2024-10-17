@@ -1,0 +1,9 @@
+chromadb==0.5.5
+Flask==3.0.3
+langchain==0.3.3
+langchain_chroma==0.1.4
+langchain_community==0.3.2
+langchain_core==0.3.11
+langchain_ollama==0.2.0
+sqlglot==25.18.0
+Werkzeug==3.0.4
