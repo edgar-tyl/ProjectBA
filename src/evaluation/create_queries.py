@@ -9,11 +9,13 @@ import os
 import argparse
 from datetime import datetime
 from pathlib import Path
-parent_directory = os.path.abspath('../')
+print(__file__)
+parent_directory = os.path.abspath(os.path.join(__file__,'..',".."))
+print(parent_directory)
 sys.path.append(parent_directory)
 from app.AiHandler import AiHandler  # type: ignore
 
-FOLDER = "../"
+FOLDER = os.path.abspath(os.path.join(__file__,'..',".."))
 
 #read queries from a file which saves queries like this : "question ||| sql"
 #line break determines new QA-tuple
